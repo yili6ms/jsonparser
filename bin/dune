@@ -1,0 +1,4 @@
+(executable
+ (public_name jsonparser)
+ (name main)
+ (libraries jsonparser))

@@ -1,0 +1,7 @@
+(library
+ (name jsonparser))
+
+(ocamllex lexer)
+
+(menhir
+ (modules parser))

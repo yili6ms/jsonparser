@@ -1,0 +1,7 @@
+(executable
+ (name test_jsonparser)
+ (libraries jsonparser))
+
+(rule
+ (alias runtest)
+ (action (run ./test_jsonparser.exe)))
