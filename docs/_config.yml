@@ -1,0 +1,81 @@
+# GitHub Pages configuration for OCaml JSON Parser documentation
+
+# Site settings
+title: OCaml JSON Parser
+description: A comprehensive JSON parsing library for OCaml with modern tooling and robust error handling
+url: "https://username.github.io"
+baseurl: "/jsonparser"
+
+# Repository information
+repository: username/jsonparser
+
+# Author information
+author:
+  name: Your Name
+  email: your.email@example.com
+
+# Build settings
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+
+# Theme
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: API Reference
+    url: /api/
+  - title: Examples
+    url: /examples/
+  - title: Guides
+    url: /guides/
+  - title: GitHub
+    url: https://github.com/username/jsonparser
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+
+# Syntax highlighting
+highlighter: rouge
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+  - LICENSE
+  - .gitignore

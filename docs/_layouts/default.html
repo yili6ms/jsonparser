@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+  
+  {% seo %}
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="wrapper">
+      <div class="site-nav">
+        <a class="site-title" href="{{ '/' | relative_url }}">
+          <span class="site-logo">🔧</span>
+          {{ site.title }}
+        </a>
+        
+        <nav class="page-nav">
+          <a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a>
+          <a href="{{ '/api/' | relative_url }}" {% if page.url contains '/api/' %}class="active"{% endif %}>API</a>
+          <a href="{{ '/examples/' | relative_url }}" {% if page.url contains '/examples/' %}class="active"{% endif %}>Examples</a>
+          <a href="{{ '/guides/' | relative_url }}" {% if page.url contains '/guides/' %}class="active"{% endif %}>Guides</a>
+          <a href="https://github.com/username/jsonparser" target="_blank">GitHub</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="wrapper">
+      {% if page.title and page.url != '/' %}
+      <div class="page-header">
+        <h1>{{ page.title }}</h1>
+        {% if page.description %}
+        <p class="page-description">{{ page.description }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      <div class="content">
+        {{ content }}
+      </div>
+      
+      {% if page.url != '/' %}
+      <div class="page-nav-footer">
+        <a href="{{ '/' | relative_url }}" class="back-home">← Back to Documentation</a>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p>&copy; {{ 'now' | date: "%Y" }} {{ site.title }}. Open source under MIT License.</p>
+        </div>
+        <div class="footer-right">
+          <a href="https://github.com/username/jsonparser">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/ocaml.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

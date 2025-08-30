@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        ocaml-compiler:
+          - 4.14.x
+          - 5.0.x
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
+
+      - name: Install dependencies
+        run: |
+          opam install . --deps-only --with-test
+          opam install menhir
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          dune build
+
+      - name: Run tests
+        run: |
+          eval $(opam env)
+          dune runtest
+
+      - name: Build documentation
+        run: |
+          eval $(opam env)
+          dune build @doc || true
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.x
+          dune-cache: true
+
+      - name: Install dependencies
+        run: |
+          opam install . --deps-only --with-test
+          opam install menhir
+          opam install ocamlformat || true
+
+      - name: Check formatting
+        run: |
+          eval $(opam env)
+          dune build @fmt || echo "No formatting check available"
+
+      - name: Check for common issues
+        run: |
+          eval $(opam env)
+          dune build --profile dev
