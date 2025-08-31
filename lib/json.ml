@@ -23,3 +23,14 @@ let parse_json input =
       let line = pos.pos_lnum in
       let col = pos.pos_cnum - pos.pos_bol + 1 in
       raise (ParseError (Printf.sprintf "Parse error at line %d, column %d" line col))
+
+(* XML Conversion Module *)
+module Xml = struct
+  include Xml
+end
+
+(* Convenience functions for XML conversion *)
+let json_to_xml = Xml.json_to_xml
+let json_to_simple_xml = Xml.json_to_simple_xml
+let json_to_attributes_xml = Xml.json_to_attributes_xml
+let json_to_xml_with_style = Xml.json_to_xml_with_style

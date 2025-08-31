@@ -36,6 +36,16 @@ let assert_raises expected_exn test_fn msg =
     (Printexc.to_string expected_exn) 
     (Printexc.to_string exn))
 
+let string_contains s substring =
+  let len_s = String.length s in
+  let len_sub = String.length substring in
+  let rec search i =
+    if i + len_sub > len_s then false
+    else if String.sub s i len_sub = substring then true
+    else search (i + 1)
+  in
+  if len_sub = 0 then true else search 0
+
 (* Basic JSON value tests *)
 let test_basic_values () =
   test "null parsing" (fun () ->
@@ -151,6 +161,84 @@ let test_roundtrip () =
     assert_equal parsed reparsed_compact "roundtrip compact";
     assert_equal parsed reparsed_pretty "roundtrip pretty")
 
+(* XML conversion tests *)
+let test_xml_conversion () =
+  test "simple JSON to XML conversion" (fun () ->
+    let json = Object [("name", String "Alice"); ("age", Int 30)] in
+    let xml = json_to_xml json in
+    let expected_parts = [
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+      "<root type=\"object\">";
+      "name"; "Alice"; "type=\"string\"";
+      "age"; "30"; "type=\"integer\"";
+      "</root>"
+    ] in
+    List.iter (fun part ->
+      if not (string_contains xml part) then
+        failwith ("XML output missing expected part: " ^ part)
+    ) expected_parts);
+  
+  test "JSON array to XML conversion" (fun () ->
+    let json = Array [String "hello"; Int 42; Bool true] in
+    let xml = json_to_simple_xml json in
+    let expected_parts = [
+      "<root>";
+      "<item>hello</item>";
+      "<item>42</item>"; 
+      "<item>true</item>";
+      "</root>"
+    ] in
+    List.iter (fun part ->
+      if not (string_contains xml part) then
+        failwith ("XML output missing expected part: " ^ part)
+    ) expected_parts);
+  
+  test "JSON null to XML conversion" (fun () ->
+    let json = Null in
+    let xml = json_to_xml json in
+    let expected_parts = [
+      "xsi:nil=\"true\"";
+      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+    ] in
+    List.iter (fun part ->
+      if not (string_contains xml part) then
+        failwith ("XML output missing expected part: " ^ part)
+    ) expected_parts);
+  
+  test "XML character escaping" (fun () ->
+    let json = String "<hello & 'world' \"test\">" in
+    let xml = json_to_xml json in
+    let expected_parts = [
+      "&lt;hello &amp; &#39;world&#39; &quot;test&quot;&gt;"
+    ] in
+    List.iter (fun part ->
+      if not (string_contains xml part) then
+        failwith ("XML output missing escaped content: " ^ part)
+    ) expected_parts);
+  
+  test "custom XML configuration" (fun () ->
+    let config = Xml.create_config 
+      ~root_element:"data" 
+      ~array_item:"element"
+      ~include_declaration:false
+      () 
+    in
+    let json = Array [Int 1; Int 2] in
+    let xml = json_to_simple_xml ~config json in
+    let expected_parts = [
+      "<data>";
+      "<element>1</element>";
+      "<element>2</element>";
+      "</data>"
+    ] in
+    (* Should not contain XML declaration *)
+    if string_contains xml "<?xml" then
+      failwith "XML output should not contain declaration";
+    List.iter (fun part ->
+      if not (string_contains xml part) then
+        failwith ("XML output missing expected part: " ^ part)
+    ) expected_parts)
+
 (* Main test runner *)
 let () =
   Printf.printf "Running JSON Parser Tests\n";
@@ -176,6 +264,9 @@ let () =
   
   Printf.printf "\nRoundtrip:\n";
   test_roundtrip ();
+  
+  Printf.printf "\nXML Conversion:\n";
+  test_xml_conversion ();
   
   Printf.printf "\n========================\n";
   Printf.printf "Results: %d/%d tests passed\n" !passed_count !test_count;

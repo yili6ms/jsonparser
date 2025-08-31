@@ -23,8 +23,12 @@ let main () =
     let parsed = Jsonparser.Json.parse_json sample_json in
     let compact = Jsonparser.Json.json_to_string parsed in
     let pretty = Jsonparser.Json.json_to_string_pretty parsed in
-    Printf.printf "\nCompact format:\n%s\n" compact;
-    Printf.printf "\nPretty format:\n%s\n" pretty
+    let xml = Jsonparser.Json.json_to_xml parsed in
+    let simple_xml = Jsonparser.Json.json_to_simple_xml parsed in
+    Printf.printf "\nCompact JSON:\n%s\n" compact;
+    Printf.printf "\nPretty JSON:\n%s\n" pretty;
+    Printf.printf "\nTyped XML:\n%s\n" xml;
+    Printf.printf "\nSimple XML:\n%s\n" simple_xml
   with
     Jsonparser.Json.ParseError msg -> Printf.printf "\nError: %s\n" msg);
   
@@ -40,7 +44,9 @@ let main () =
       try
         let parsed = Jsonparser.Json.parse_json input in
         let pretty = Jsonparser.Json.json_to_string_pretty parsed in
-        Printf.printf "Parsed:\n%s\n" pretty
+        let xml = Jsonparser.Json.json_to_simple_xml parsed in
+        Printf.printf "JSON:\n%s\n" pretty;
+        Printf.printf "XML:\n%s\n" xml
       with
         Jsonparser.Json.ParseError msg -> Printf.printf "Error: %s\n" msg;
       loop ()

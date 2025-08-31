@@ -248,6 +248,139 @@ All functions in this library are **thread-safe** as they:
 - Perform no global state mutations
 - Have no side effects (except for exceptions)
 
+## XML Conversion Functions
+
+The library also provides comprehensive JSON to XML conversion capabilities.
+
+#### `json_to_xml`
+
+```ocaml
+val json_to_xml : ?config:Xml.xml_config -> json_value -> string
+```
+
+**Description:** Converts a `json_value` to XML with type attributes.
+
+**Parameters:**
+- `?config:Xml.xml_config` - Optional XML configuration (default: `Xml.default_config`)
+- `json_value` - The JSON value to convert
+
+**Returns:** XML string with type information
+
+**Example:**
+```ocaml
+let json = Object [("name", String "Alice"); ("age", Int 30)]
+let xml = json_to_xml json
+(*
+Returns:
+<?xml version="1.0" encoding="UTF-8"?>
+<root type="object">
+  <name type="string">Alice</name>
+  <age type="integer">30</age>
+</root>
+*)
+```
+
+#### `json_to_simple_xml`
+
+```ocaml
+val json_to_simple_xml : ?config:Xml.xml_config -> json_value -> string
+```
+
+**Description:** Converts a `json_value` to clean XML without type attributes.
+
+**Example:**
+```ocaml
+let xml = json_to_simple_xml json
+(*
+Returns:
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <name>Alice</name>
+  <age>30</age>
+</root>
+*)
+```
+
+#### `json_to_attributes_xml`
+
+```ocaml
+val json_to_attributes_xml : ?config:Xml.xml_config -> json_value -> string
+```
+
+**Description:** Converts simple JSON values to XML attributes when possible.
+
+#### `json_to_xml_with_style`
+
+```ocaml
+val json_to_xml_with_style : ?config:Xml.xml_config -> Xml.conversion_style -> json_value -> string
+
+type conversion_style = 
+  | Typed      (* Include type attributes *)
+  | Simple     (* Clean XML without type info *)
+  | Attributes (* Use XML attributes for simple values *)
+```
+
+**Description:** Converts JSON to XML using the specified style.
+
+### XML Configuration
+
+#### `Xml.xml_config`
+
+```ocaml
+type xml_config = {
+  root_element: string;        (* Root element name (default: "root") *)
+  array_element: string;       (* Array container name (default: "array") *)
+  array_item: string;          (* Array item name (default: "item") *)
+  indent_size: int;            (* Indentation spaces (default: 2) *)
+  include_declaration: bool;   (* Include <?xml?> declaration (default: true) *)
+  encoding: string;            (* XML encoding (default: "UTF-8") *)
+}
+```
+
+#### `Xml.create_config`
+
+```ocaml
+val create_config :
+  ?root_element:string ->
+  ?array_element:string ->
+  ?array_item:string ->
+  ?indent_size:int ->
+  ?include_declaration:bool ->
+  ?encoding:string ->
+  unit -> xml_config
+```
+
+**Example:**
+```ocaml
+let custom_config = Xml.create_config 
+  ~root_element:"data"
+  ~array_item:"element"
+  ~include_declaration:false
+  ()
+
+let xml = json_to_simple_xml ~config:custom_config json
+```
+
+## Module: `Jsonparser.Json.Xml`
+
+Low-level XML conversion module with additional utilities.
+
+### XML Character Escaping
+
+The XML conversion properly handles:
+- `<` → `&lt;`
+- `>` → `&gt;`
+- `&` → `&amp;`
+- `"` → `&quot;`
+- `'` → `&#39;`
+
+### XML Name Sanitization
+
+Invalid XML element names are automatically sanitized:
+- Non-letter starting characters → prefixed with valid character
+- Invalid characters → replaced with `_`
+- Empty names → replaced with `"element"`
+
 ## Version Compatibility
 
 - **OCaml**: 4.08 or later
